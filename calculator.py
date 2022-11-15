@@ -16,23 +16,23 @@ def infix_to_postfix(infix_exp):
     operator_stack = Stack()
     prec = {"/": 2, "*": 2, "+": 1, "-": 1, "(": 0} # Need it to compare precedence of Stack symbols
 
-    for i in infix:
-        if i in "(/*+-":
+    for symbol in infix:
+        if symbol in "(/*+-":
             if not operator_stack.is_empty():
                 top = operator_stack.peek()
-                while prec[i] <= prec[top]:
+                while prec[symbol] <= prec[top]:
                     top = operator_stack.pop()
                     postfix_list.append(top)
-            operator_stack.push(i)
+            operator_stack.push(symbol)
 
-        elif i == ")":
+        elif symbol == ")":
             try:
                 top = operator_stack.pop()
                 while top != "(":
                     postfix_list.append(top)
                     top = operator_stack.pop()
             except IndexError:
-                sys.exit("Not a valid expression")
+                sys.exit("Infix is not a valid expression")
             
         else:
             postfix_list.append(i)
@@ -47,7 +47,21 @@ def infix_to_postfix(infix_exp):
 
 
 def evaluate_postfix(postfix_exp):
-    ...
+    operand_stack = Stack()
+    for symbol in postfix_exp:
+        if symbol.isdigit():
+            operand_stack.push(symbol)
+        elif symbol == "+":
+            result = operand_stack.pop() + operand_stack.pop()
+        elif symbol == "-":
+            result = operand_stack.pop() - operand_stack.pop()
+        elif symbol == "*":
+            result = operand_stack.pop() * operand_stack.pop()
+        elif symbol == "/":
+            result = operand_stack.pop() / operand_stack.pop()
+        else:
+            raise ValueError("Postfix is not a valid expression")
+
 
 def parse_exp(exp):
         for s in exp:
