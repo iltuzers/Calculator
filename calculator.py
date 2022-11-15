@@ -1,6 +1,13 @@
 from Stack import Stack
+from Queue import Queue
 import sys
+"""
+TODO:
+    check what happens if a number is decimal or if it is more than 1 digit
+    I think I can use Queue to decimal numbers, 2 or more digit numbers
+    or I should just place spaces between numbers
 
+"""
 
 """
 Algorithm:
@@ -9,18 +16,20 @@ Algorithm:
 3. If 0..9, then add it to the list
 
 
+
 """
+
 def infix_to_postfix(infix_exp):
     infix = parse_exp(infix_exp)
     postfix_list = []
     operator_stack = Stack()
     prec = {"/": 2, "*": 2, "+": 1, "-": 1, "(": 0} # Need it to compare precedence of Stack symbols
 
-    for symbol in infix:
+    for symbol in infix.split():
         if symbol in "(/*+-":
             if not operator_stack.is_empty():
                 top = operator_stack.peek()
-                while prec[symbol] <= prec[top]:
+                while prec[symbol] <= prec[top] and not operator_stack.is_empty():
                     top = operator_stack.pop()
                     postfix_list.append(top)
             operator_stack.push(symbol)
@@ -35,45 +44,73 @@ def infix_to_postfix(infix_exp):
                 sys.exit("Infix is not a valid expression")
             
         else:
-            postfix_list.append(i)
+            postfix_list.append(symbol)
     
     while not operator_stack.is_empty():
         postfix_list.append(operator_stack.pop())
     
-    return "".join(postfix_list)
-
-
-
-
+    
+    return " ".join(postfix_list)
 
 def evaluate_postfix(postfix_exp):
     operand_stack = Stack()
     for symbol in postfix_exp:
-        if symbol.isdigit():
+        if is_number(symbol):
             operand_stack.push(symbol)
-        elif symbol == "+":
-            result = operand_stack.pop() + operand_stack.pop()
-        elif symbol == "-":
-            result = operand_stack.pop() - operand_stack.pop()
-        elif symbol == "*":
-            result = operand_stack.pop() * operand_stack.pop()
-        elif symbol == "/":
-            result = operand_stack.pop() / operand_stack.pop()
+        elif symbol in "+-/*":
+            second_op, first_op = int(operand_stack.pop()), int(operand_stack.pop()) # Top of the stack is the last element
+            result = apply_operator(first_op, second_op, symbol)
+            operand_stack.push(result)
+
         else:
             raise ValueError("Postfix is not a valid expression")
+    return result
 
+def is_number(anumber):
+    for i in anumber:
+        if not (i.isdigit() or i == "."):
+            return False
+    return True
+
+def calculate(infix):
+    postfix = infix_to_postfix(infix)
+    return evaluate_postfix(postfix)
+
+def apply_operator(num1, num2, operator):
+    if operator == "/":
+        return num1 / num2
+    elif operator == "*":
+        return num1 * num2
+    elif operator == "+":
+        return num1 + num2
+    elif operator == "-":
+        return num1 - num2
+    else:
+        raise ValueError("Invalid operator")
 
 def parse_exp(exp):
         for s in exp:
-            if s not in "0123456789 +-*/()":
+            if s not in "0123456789. +-*/()":
                 raise ValueError("Invalid Character")
-        exp_list = str(exp.split())
-        return exp_list
+        exp = "".join(exp.split()) # Remove white spaces
+        exp = add_space(exp)
+        return exp
+
+def add_space(exp):
+    number_queue = Queue()
+    spaced_exp = ""
+    for i in exp:
+        if i in "()+-*/":
+            while not number_queue.is_empty():
+                spaced_exp += number_queue.deque()
+            spaced_exp += " " + i
+        elif i in "0123456789.":
+            number_queue.enqueue(i)
+    return spaced_exp.strip()
 
 def main():
     infix = input("Calculate: ")
-    postfix = infix_to_postfix(infix)
-    result = evaluate_postfix(postfix)
+    result = calculate(infix)
     print(infix + "= " + str(result))
 
 

@@ -1,7 +1,7 @@
 class Stack:
     
     def __init__(self):
-        self._items = [] # Use list to keep items in a Stack
+        self.items = [] # Use list to keep items in a Stack
     
     """ Add an item to the Stack """
     def push(self, item):
@@ -13,7 +13,10 @@ class Stack:
     
     """ Check the top element of the Stack. It doesn't remove the item """
     def peek(self):
-        return self.items[len(self.items) - 1]
+        if self.is_empty():
+            raise IndexError("Stack is empty")
+        else:
+            return self.items[len(self.items) - 1]
     
     """ Check if the Stack is empty """
     def is_empty(self):
