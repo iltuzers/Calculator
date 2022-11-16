@@ -1,3 +1,4 @@
+import sys
 class Stack:
     
     def __init__(self):
@@ -9,7 +10,10 @@ class Stack:
     
     """ Return the top of Stack """
     def pop(self):
-        return self.items.pop() # LAST IN FIRST OUT
+        try :
+            return self.items.pop() # LAST IN FIRST OUT
+        except IndexError:
+            sys.exit("Empty Stack")
     
     """ Check the top element of the Stack. It doesn't remove the item """
     def peek(self):

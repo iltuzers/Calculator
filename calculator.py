@@ -18,21 +18,26 @@ Algorithm:
 
 
 """
-
+# assert '1 2 3 4 - * - 5 / 6 -' == '1 2 3 4 - * 5 / - 6 -'
+""" Returns Postfix Expression with spaces"""
 def infix_to_postfix(infix_exp):
     infix = parse_exp(infix_exp)
     postfix_list = []
     operator_stack = Stack()
     prec = {"/": 2, "*": 2, "+": 1, "-": 1, "(": 0} # Need it to compare precedence of Stack symbols
-
     for symbol in infix.split():
         if symbol in "(/*+-":
-            if not operator_stack.is_empty():
-                top = operator_stack.peek()
-                while prec[symbol] <= prec[top] and not operator_stack.is_empty():
+            if symbol == "(":
+                operator_stack.push(symbol)
+            elif symbol in "+-*/":
+
+                if not operator_stack.is_empty():
                     top = operator_stack.pop()
-                    postfix_list.append(top)
-            operator_stack.push(symbol)
+                    while prec[symbol] <= prec[top] and not operator_stack.is_empty():
+                        postfix_list.append(top)
+                        top = operator_stack.pop()
+                    
+                operator_stack.push(symbol)
 
         elif symbol == ")":
             try:
@@ -54,7 +59,8 @@ def infix_to_postfix(infix_exp):
 
 def evaluate_postfix(postfix_exp):
     operand_stack = Stack()
-    for symbol in postfix_exp:
+    result = 0
+    for symbol in postfix_exp.split():
         if is_number(symbol):
             operand_stack.push(symbol)
         elif symbol in "+-/*":
@@ -66,6 +72,7 @@ def evaluate_postfix(postfix_exp):
             raise ValueError("Postfix is not a valid expression")
     return result
 
+# Checks if a string is a float or int
 def is_number(anumber):
     for i in anumber:
         if not (i.isdigit() or i == "."):
@@ -88,24 +95,32 @@ def apply_operator(num1, num2, operator):
     else:
         raise ValueError("Invalid operator")
 
+# Accepts inputs with or without spaces
 def parse_exp(exp):
         for s in exp:
             if s not in "0123456789. +-*/()":
                 raise ValueError("Invalid Character")
         exp = "".join(exp.split()) # Remove white spaces
-        exp = add_space(exp)
+        exp = add_space(exp) 
         return exp
 
+# Input: infix without spaces, Output: Infix with spaces
 def add_space(exp):
     number_queue = Queue()
     spaced_exp = ""
     for i in exp:
         if i in "()+-*/":
             while not number_queue.is_empty():
-                spaced_exp += number_queue.deque()
+                spaced_exp += number_queue.dequeue()
             spaced_exp += " " + i
         elif i in "0123456789.":
+            if number_queue.is_empty(): # Need space before the number
+                spaced_exp += " "
             number_queue.enqueue(i)
+        
+    if not number_queue.is_empty():
+        while not number_queue.is_empty():
+            spaced_exp += number_queue.dequeue()
     return spaced_exp.strip()
 
 def main():
