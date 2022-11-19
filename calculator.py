@@ -1,26 +1,40 @@
-import infix
-import postfix
+from infix import Infix
+from postfix import Postfix
 import sys
 
-class Calculator:
-    def __init__(self):
-        self.calc = calc
 
-    def calculate(infix):
-        postfix = infix_to_postfix(infix)
-        return evaluate_postfix(postfix)
+def calculate(infix):
+    """Returns the result of the calculation
+    :param infix: A mathematical expression
+    :type infix: str
+    :rtype: float
+    :return: Evaluation of the infix expression
+    
+    """
 
+    postfix = Infix.infix_to_postfix(infix)
+    return Postfix.evaluate(postfix)
 
 def main():
-    infix = input("Calculate: ")
-    result = calculate(infix)
-    print(infix + "= " + str(result))
 
-    # Take a file as command line argument : First txt file
-    # Scan the file and find all valid infix expressions
-    # Evaluate them
-    # 
+    while True:
 
+        try:
+            infix_exp = input("Press Ctrl-C or (Ctrl-Z + Enter) to exit. Otherwise Calculate: ")
+  
+        except (EOFError, KeyboardInterrupt):
+            print("Exiting")
+            break
+
+        try:
+            result = calculate(infix_exp)
+
+        except ValueError:
+            pass
+
+        else:
+            print(infix_exp + " = " + str(result))
+            
 
 if __name__ == "__main__":
     main()
